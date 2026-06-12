@@ -1,0 +1,15 @@
+[project]
+name = "hubeau-lab"
+version = "0.1.0"
+description = "Real-world usage notebooks for hubeau-data"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "hubeau-data",
+    "jupyter",
+    "pandas",
+    "matplotlib",
+]
+
+[tool.uv]
+package = false
