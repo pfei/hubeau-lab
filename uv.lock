@@ -514,7 +514,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "hubeau-data" },
+    { name = "hubeau-data", specifier = ">=0.1.0" },
     { name = "jupyter" },
     { name = "matplotlib" },
     { name = "pandas" },
