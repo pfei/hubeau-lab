@@ -33,7 +33,7 @@ async def fetch(department: str, n_stations: int, window_days: int) -> tuple:
             StationParams(en_service=True, code_departement=department, size=n_stations)
         )
         print(
-            f"Fetching {window_days}d of Q observations for {len(stations)} stations..."
+            f"Fetching {window_days}d of Q observations for {len(stations.data)} stations..."
         )
         results = await asyncio.gather(
             *[
@@ -46,7 +46,7 @@ async def fetch(department: str, n_stations: int, window_days: int) -> tuple:
                         sort="asc",
                     )
                 )
-                for s in stations
+                for s in stations.data
             ]
         )
     return stations, results
@@ -73,8 +73,8 @@ def ingest(stations, results, db_path: Path) -> int:
             o.resultat_obs,
             o.grandeur_hydro,
         )
-        for s, obs in zip(stations, results)
-        for o in obs
+        for s, obs in zip(stations.data, results)
+        for o in obs.data
     ]
     con.executemany("INSERT INTO observations VALUES (?,?,?,?,?)", rows)
     con.commit()
@@ -85,8 +85,8 @@ def ingest(stations, results, db_path: Path) -> int:
 
 def main() -> None:
     stations, results = asyncio.run(fetch(DEPARTMENT, N_STATIONS, WINDOW_DAYS))
-    for s, obs in zip(stations, results):
-        print(f"  {s.code_station} ({s.libelle_station}): {len(obs)} obs")
+    for s, obs in zip(stations.data, results):
+        print(f"  {s.code_station} ({s.libelle_station}): {len(obs.data)} obs")
     n_rows = ingest(stations, results, DB_PATH)
     print(f"Inserted {n_rows} rows into {DB_PATH}")
 

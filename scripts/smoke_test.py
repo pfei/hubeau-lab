@@ -51,15 +51,19 @@ params = ObservationTrParams(
     sort="asc",
 )
 obs = client.hydrometrie.get_observations_tr(params)
-check("observations_tr returns data", len(obs) > 0, f"got {len(obs)}")
+check("observations_tr returns data", len(obs.data) > 0, f"got {len(obs.data)}")
 check(
     "code_entite filter works",
-    all(o.code_station == STATION for o in obs if o.code_station is not None),
+    all(o.code_station == STATION for o in obs.data if o.code_station is not None),
     "unexpected stations in response",
 )
 check(
     "resultat_obs is float",
-    all(isinstance(o.resultat_obs, float) for o in obs if o.resultat_obs is not None),
+    all(
+        isinstance(o.resultat_obs, float)
+        for o in obs.data
+        if o.resultat_obs is not None
+    ),
 )
 
 # Summary
