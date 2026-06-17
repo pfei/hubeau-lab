@@ -489,16 +489,16 @@ wheels = [
 
 [[package]]
 name = "hubeau-data"
-version = "0.2.0"
+version = "0.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "httpx" },
     { name = "pydantic" },
     { name = "tenacity" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/97/7b/c7e57a2397f4e52331544d6d9e242522f39f5fe6e651999c7e265f6d73e8/hubeau_data-0.2.0.tar.gz", hash = "sha256:6e7c07d6cc543afbd06438b4a24d4bdc9ffc8e5ac4f1b9172f45707355f91fd6", size = 166641, upload-time = "2026-06-16T16:56:27.554Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/66/61/4637a3dd7ce7392c3ddfe3695d9c5526755ad314e4ef8dcd500bf689a7b0/hubeau_data-0.3.0.tar.gz", hash = "sha256:31f06806f2403973f14b3257ffb45260e351569d4766827cacb2185f1fca7f15", size = 167114, upload-time = "2026-06-17T11:26:27.342Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/50/33/4e74a23b38eb00b8bbd18da0562293c6764a266a1e5d1d8350e4ec9d474a/hubeau_data-0.2.0-py3-none-any.whl", hash = "sha256:d2c333459addec0a7ae849d7f36b8083f0f67e8dafc8d2cdc522c0da65ce3cfe", size = 52929, upload-time = "2026-06-16T16:56:30.396Z" },
+    { url = "https://files.pythonhosted.org/packages/55/a9/8b1f12cc4f14e1764daefb2f43d32c7908ed783b925b944b0430aa7821c9/hubeau_data-0.3.0-py3-none-any.whl", hash = "sha256:8a92ef02a90be0fbd4162312bf20c9a80868d637832f766ca25d04ba1517faa0", size = 53172, upload-time = "2026-06-17T11:26:25.454Z" },
 ]
 
 [[package]]
@@ -514,7 +514,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "hubeau-data", specifier = ">=0.1.0" },
+    { name = "hubeau-data", specifier = ">=0.3.0" },
     { name = "jupyter" },
     { name = "matplotlib" },
     { name = "pandas" },
