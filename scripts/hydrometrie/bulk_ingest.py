@@ -14,7 +14,13 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from hubeau_data.async_client import AsyncHubeauClient
-from hubeau_data.models.hydrometrie import ObservationTrParams, StationParams
+from hubeau_data.models.hydrometrie import (
+    ObservationTr,
+    ObservationTrParams,
+    Station,
+    StationParams,
+)
+from hubeau_data.models.pagination import PagedResponse
 
 DEPARTMENT = "64"  # Pyrénées-Atlantiques
 N_STATIONS = 5
@@ -24,7 +30,9 @@ DB_PATH = (
 )
 
 
-async def fetch(department: str, n_stations: int, window_days: int) -> tuple:
+async def fetch(
+    department: str, n_stations: int, window_days: int
+) -> tuple[PagedResponse[Station], list[PagedResponse[ObservationTr]]]:
     since = (datetime.now(timezone.utc) - timedelta(days=window_days)).strftime(
         "%Y-%m-%dT%H:%M:%SZ"
     )
@@ -33,7 +41,8 @@ async def fetch(department: str, n_stations: int, window_days: int) -> tuple:
             StationParams(en_service=True, code_departement=department, size=n_stations)
         )
         print(
-            f"Fetching {window_days}d of Q observations for {len(stations.data)} stations..."
+            f"Fetching {window_days}d of Q observations "
+            f"for {len(stations.data)} stations..."
         )
         results = await asyncio.gather(
             *[
@@ -52,7 +61,11 @@ async def fetch(department: str, n_stations: int, window_days: int) -> tuple:
     return stations, results
 
 
-def ingest(stations, results, db_path: Path) -> int:
+def ingest(
+    stations: PagedResponse[Station],
+    results: list[PagedResponse[ObservationTr]],
+    db_path: Path,
+) -> int:
     db_path.parent.mkdir(parents=True, exist_ok=True)
     con = sqlite3.connect(db_path)
     con.execute("""
@@ -78,7 +91,8 @@ def ingest(stations, results, db_path: Path) -> int:
     ]
     con.executemany("INSERT INTO observations VALUES (?,?,?,?,?)", rows)
     con.commit()
-    total = con.execute("SELECT COUNT(*) FROM observations").fetchone()[0]
+    row = con.execute("SELECT COUNT(*) FROM observations").fetchone()
+    total: int = row[0]
     con.close()
     return total
 

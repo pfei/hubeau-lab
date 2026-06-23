@@ -14,3 +14,27 @@ dependencies = [
 
 [tool.uv]
 package = false
+
+[dependency-groups]
+dev = [
+    "ruff>=0.11.10",
+    "mypy>=1.10.0,<2.0.0",
+    "ipython>=8.24",
+    "pydantic>=2.7.0",
+]
+
+[tool.ruff]
+line-length = 88
+extend-include = ["*.ipynb"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.ruff.lint.per-file-ignores]
+"*.ipynb" = ["E501", "I001"]
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+ignore_missing_imports = true
+plugins = ["pydantic.mypy"]

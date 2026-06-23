@@ -20,7 +20,8 @@ from pathlib import Path
 import pandas as pd
 from hubeau_data.async_client import AsyncHubeauClient
 from hubeau_data.client import HubeauClient
-from hubeau_data.models.hydrometrie import StationParams
+from hubeau_data.models.hydrometrie import Station, StationParams
+from hubeau_data.models.pagination import PagedResponse
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -52,7 +53,7 @@ DEFAULT_N_STATIONS = 20
 # ---------------------------------------------------------------------------
 
 
-async def fetch_all_stations(deps: list[str], n: int) -> dict[str, list]:
+async def fetch_all_stations(deps: list[str], n: int) -> dict[str, list[Station]]:
     """Fetch up to n active stations per department, concurrently."""
     print(f"[1/2] Fetching station lists for {len(deps)} departments...", flush=True)
     async with AsyncHubeauClient(max_concurrent=5) as client:
@@ -65,12 +66,13 @@ async def fetch_all_stations(deps: list[str], n: int) -> dict[str, list]:
             ],
             return_exceptions=True,
         )
-    stations_by_dep: dict[str, list] = {}
+    stations_by_dep: dict[str, list[Station]] = {}
     for dep, r in zip(deps, results):
         if isinstance(r, Exception):
             print(f"  ✗ {dep}: {type(r).__name__}: {r}", flush=True)
             stations_by_dep[dep] = []
         else:
+            assert isinstance(r, PagedResponse)
             stations_by_dep[dep] = r.data
     total = sum(len(v) for v in stations_by_dep.values())
     print(f"  → {total} stations across {len(deps)} departments", flush=True)
@@ -82,12 +84,10 @@ async def fetch_all_stations(deps: list[str], n: int) -> dict[str, list]:
 # ---------------------------------------------------------------------------
 
 
-def run_coverage(
-    stations_by_dep: dict[str, list],
-) -> list[dict]:
+def run_coverage(stations_by_dep: dict[str, list[Station]]) -> list[dict[str, object]]:
     """Run data_coverage() for every station, logging progress to stdout."""
     client = HubeauClient()
-    rows: list[dict] = []
+    rows: list[dict[str, object]] = []
 
     all_pairs = [
         (dep, s) for dep, stations in stations_by_dep.items() for s in stations
@@ -166,7 +166,8 @@ def main() -> None:
         flush=True,
     )
     print(
-        f"  departments: {len(ALL_DEPS)} ({len(METRO_DEPS)} metro + {len(DOM_DEPS)} DOM)",
+        f"  departments: {len(ALL_DEPS)} ({len(METRO_DEPS)} metro "
+        f"+ {len(DOM_DEPS)} DOM)",
         flush=True,
     )
     print(f"  stations per department: {args.n_stations}", flush=True)
